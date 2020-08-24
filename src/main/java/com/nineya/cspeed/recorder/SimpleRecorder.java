@@ -1,6 +1,7 @@
 package com.nineya.cspeed.recorder;
 
 import com.nineya.cspeed.internal.SpeedEvent;
+import com.nineya.cspeed.util.StatisticsUtil;
 import com.nineya.cspeed.util.StringUtil;
 
 import java.util.ArrayList;
@@ -33,8 +34,21 @@ public class SimpleRecorder extends AbstractRecorder {
 
     @Override
     protected StatisticPattern setStatisticPattern() {
-        return (name, list) -> {
-            System.out.println(name + " 统计结果：");
+        return new StatisticPattern<List<Long>>() {
+            @Override
+            public void print(String name, List<Long> list) {
+                list.sort((a,b) -> (int) (a - b));
+                StringBuilder sb = new StringBuilder(name + " 统计结果：");
+                sb.append("\ncount: " + list.size());
+                sb.append("\nmean: " + StringUtil.detailNs((long) StatisticsUtil.mean(list)));
+                sb.append("\nmin: " + StringUtil.detailNs(list.get(0)));
+                sb.append("\nmax: " + StringUtil.detailNs(list.get(list.size() - 1)));
+                sb.append("\n90 th: " + StringUtil.detailNs((long) StatisticsUtil.quantileNSub(0.9, list)));
+                sb.append("\n75 th: " + StringUtil.detailNs((long) StatisticsUtil.quantileNSub(0.75, list)));
+                sb.append("\n50 th: " + StringUtil.detailNs((long) StatisticsUtil.quantileNSub(0.5, list)));
+                sb.append("\n25 th: " + StringUtil.detailNs((long) StatisticsUtil.quantileNSub(0.25, list)));
+                System.out.println(sb.toString());
+            }
         };
     }
 
@@ -56,5 +70,6 @@ public class SimpleRecorder extends AbstractRecorder {
     @Override
     public void stop() {
         getStatisticPattern().print(getName(), nums);
+        nums.clear();
     }
 }

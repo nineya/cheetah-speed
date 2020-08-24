@@ -49,7 +49,7 @@ public abstract class AbstractRecorder implements Recorder {
     }
 
     @FunctionalInterface
-    public interface StatisticPattern<V extends List>{
+    public interface StatisticPattern<V>{
         void print(String name, V list);
     }
 }
