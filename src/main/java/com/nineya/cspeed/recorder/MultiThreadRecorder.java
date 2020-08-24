@@ -1,5 +1,10 @@
 package com.nineya.cspeed.recorder;
 
+import com.nineya.cspeed.internal.SpeedEvent;
+import com.nineya.cspeed.util.StatisticsUtil;
+import com.nineya.cspeed.util.StringUtil;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,8 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * 用于多线程记录的记录器
  */
 public class MultiThreadRecorder extends AbstractRecorder {
-    private Map<String, List<Long>> nums = new ConcurrentHashMap<String, List<Long>>();
-    private Map<String, Long> startTimes = new ConcurrentHashMap<String, Long>();
+    private Map<String, List<Long>> nums = new ConcurrentHashMap<>();
+    private Map<String, Long> startTimes = new ConcurrentHashMap<>();
+    private int totalCount = 0;
 
     /**
      * 实例化计速器
@@ -27,7 +33,14 @@ public class MultiThreadRecorder extends AbstractRecorder {
      */
     @Override
     protected EveryPattern setEveryPattern() {
-        return null;
+        return (event)->{
+            System.out.println(String.format("[%s]\t[%s - %s] - 第%s次 - %s",
+                    StringUtil.getStringTime(event.getCurrentTime()),
+                    event.getName(),
+                    event.getThreadName(),
+                    event.getCount(),
+                    StringUtil.nsPattern(event.getRunTime())));
+        };
     }
 
     /**
@@ -36,7 +49,22 @@ public class MultiThreadRecorder extends AbstractRecorder {
      */
     @Override
     protected StatisticPattern setStatisticPattern() {
-        return null;
+        return new StatisticPattern<List<Long>>() {
+            @Override
+            public void print(String name, List<Long> list) {
+                list.sort((a,b) -> (int) (a - b));
+                StringBuilder sb = new StringBuilder(name + " 统计结果：");
+                sb.append("\ncount: " + list.size());
+                sb.append("\nmean: " + StringUtil.detailNs((long) StatisticsUtil.mean(list)));
+                sb.append("\nmin: " + StringUtil.detailNs(list.get(0)));
+                sb.append("\nmax: " + StringUtil.detailNs(list.get(list.size() - 1)));
+                sb.append("\n90 th: " + StringUtil.detailNs((long) StatisticsUtil.quantileNSub(0.9, list)));
+                sb.append("\n75 th: " + StringUtil.detailNs((long) StatisticsUtil.quantileNSub(0.75, list)));
+                sb.append("\n50 th: " + StringUtil.detailNs((long) StatisticsUtil.quantileNSub(0.5, list)));
+                sb.append("\n25 th: " + StringUtil.detailNs((long) StatisticsUtil.quantileNSub(0.25, list)));
+                System.out.println(sb.toString());
+            }
+        };
     }
 
 
@@ -45,8 +73,11 @@ public class MultiThreadRecorder extends AbstractRecorder {
      * @return 返回本身，装饰器模式
      */
     @Override
-    public Recorder start() {
-        return null;
+    public MultiThreadRecorder start() {
+        SpeedEvent event = new SpeedEvent(getName(), System.nanoTime());
+        String threadName = Thread.currentThread().getName();
+        startTimes.put(Thread.currentThread().getName(), System.nanoTime());
+        return this;
     }
 
     /**
@@ -54,8 +85,21 @@ public class MultiThreadRecorder extends AbstractRecorder {
      * @return 返回本身，装饰器模式
      */
     @Override
-    public Recorder end() {
-        return null;
+    public MultiThreadRecorder end() {
+        String threadName = Thread.currentThread().getName();
+        SpeedEvent event = new SpeedEvent(getName(), startTimes.get(threadName));
+        event.setEndTime(System.nanoTime());
+        List<Long> list = nums.get(threadName);
+        if (list == null){
+            list = new ArrayList<>();
+            nums.put(threadName, list);
+        }
+        list.add(event.getRunTime());
+        event.setCount(list.size());
+        totalCount++;
+        event.addData("totalCount", totalCount);
+        getEveryPattern().print(event);
+        return this;
     }
 
     /**

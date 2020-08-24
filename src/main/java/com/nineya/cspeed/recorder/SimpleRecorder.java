@@ -65,7 +65,7 @@ public class SimpleRecorder extends AbstractRecorder {
      * @return 返回本身，装饰器模式
      */
     @Override
-    public Recorder start() {
+    public SimpleRecorder start() {
         event = new SpeedEvent(getName(), System.nanoTime());
         return this;
     }
@@ -75,10 +75,10 @@ public class SimpleRecorder extends AbstractRecorder {
      * @return 返回本身，装饰器模式
      */
     @Override
-    public Recorder end() {
+    public SimpleRecorder end() {
         event.setEndTime(System.nanoTime());
-        event.setCount(nums.size() + 1);
         nums.add(event.getRunTime());
+        event.setCount(nums.size());
         getEveryPattern().print(event);
         return this;
     }
