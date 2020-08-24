@@ -50,6 +50,11 @@ public class StatisticsUtil {
         return b + (position - m) * (a - b);
     }
 
+    /**
+     * 计算平均值
+     * @param list 需要计算平均值的列表
+     * @return 平均值
+     */
     public static double mean(List<Long> list){
         return list.stream().mapToDouble(a->(double)a).average().getAsDouble();
     }

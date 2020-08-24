@@ -20,6 +20,10 @@ public class SimpleRecorder extends AbstractRecorder {
         super(name);
     }
 
+    /**
+     * 创建默认的记录接口实现
+     * @return 记录接口
+     */
     @Override
     protected EveryPattern setEveryPattern() {
         return (event)->{
@@ -27,11 +31,15 @@ public class SimpleRecorder extends AbstractRecorder {
                     StringUtil.getStringTime(event.getCurrentTime()),
                     event.getName(),
                     event.getThreadName(),
-                    event.getNum(),
+                    event.getCount(),
                     StringUtil.nsPattern(event.getRunTime())));
         };
     }
 
+    /**
+     * 创建默认的统计接口实现
+     * @return 统计接口
+     */
     @Override
     protected StatisticPattern setStatisticPattern() {
         return new StatisticPattern<List<Long>>() {
@@ -52,21 +60,32 @@ public class SimpleRecorder extends AbstractRecorder {
         };
     }
 
+    /**
+     * 开始一次记录，在这里应该创建一个SpeedEvent实体对象，传入开始时间
+     * @return 返回本身，装饰器模式
+     */
     @Override
     public Recorder start() {
         event = new SpeedEvent(getName(), System.nanoTime());
         return this;
     }
 
+    /**
+     * 结束一次记录，在这里进行一次记录的输出，同时将耗时的值保存到列表用于统计
+     * @return 返回本身，装饰器模式
+     */
     @Override
     public Recorder end() {
         event.setEndTime(System.nanoTime());
-        event.setNum(nums.size() + 1);
+        event.setCount(nums.size() + 1);
         nums.add(event.getRunTime());
         getEveryPattern().print(event);
         return this;
     }
 
+    /**
+     * 停止记录器，在这里将对记录器中所有内容进行统计，统计完成后清空记录器内容
+     */
     @Override
     public void stop() {
         getStatisticPattern().print(getName(), nums);

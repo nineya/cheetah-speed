@@ -71,6 +71,11 @@ public class StringUtil {
         return sb.toString();
     }
 
+    /**
+     * 纳秒（ns）转毫秒（ms）
+     * @param time
+     * @return
+     */
     public static double nsToMs(long time){
         return time/1000000;
     }
