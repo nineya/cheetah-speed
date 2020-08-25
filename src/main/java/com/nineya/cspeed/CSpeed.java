@@ -1,6 +1,7 @@
 package com.nineya.cspeed;
 
 import com.nineya.cspeed.recorder.AbstractRecorder;
+import com.nineya.cspeed.recorder.Recorder;
 import com.nineya.cspeed.recorder.SimpleRecorder;
 
 import java.util.Map;
@@ -24,15 +25,12 @@ public class CSpeed {
     }
 
     /**
-     * 传入记录器名称，如果记录器已经存在，则直接get，如果不存在，调用addRecorder(Recorder)创建一个<u>SimpleRecorder</u>记录器。
+     * 传入记录器名称，如果记录器已经存在，则直接get
      * @param name 记录器名称
      * @return Recorder记录器
      */
     public static AbstractRecorder getRecorder(String name){
-        if (recorders.containsKey(name)){
-            return recorders.get(name);
-        }
-        return addRecorder(new SimpleRecorder(name));
+        return recorders.get(name);
     }
 
     /**
@@ -53,7 +51,7 @@ public class CSpeed {
      * @param recorder 记录器
      * @return Recorder记录器
      */
-    public static AbstractRecorder addRecorder(AbstractRecorder recorder){
+    public static<T extends AbstractRecorder> T addRecorder(T recorder){
         recorders.put(recorder.getName(), recorder);
         return recorder;
     }

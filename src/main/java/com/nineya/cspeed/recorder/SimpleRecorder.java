@@ -27,12 +27,12 @@ public class SimpleRecorder extends AbstractRecorder {
     @Override
     protected EveryPattern setEveryPattern() {
         return (event)->{
-            System.out.println(String.format("[%s]\t[%s - %s] - 第%s次 - %s",
-                    StringUtil.getStringTime(event.getCurrentTime()),
-                    event.getName(),
-                    event.getThreadName(),
-                    event.getCount(),
-                    StringUtil.nsPattern(event.getRunTime())));
+            System.out.println(String.format("[%s]\t[%s - %s] - Count %d - %s",
+                StringUtil.getStringTime(event.getCurrentTime()),
+                event.getName(),
+                event.getThreadName(),
+                event.getCount(),
+                StringUtil.nsPattern(event.getRunTime())));
         };
     }
 
@@ -46,11 +46,12 @@ public class SimpleRecorder extends AbstractRecorder {
             @Override
             public void print(String name, List<Long> list) {
                 list.sort((a,b) -> (int) (a - b));
-                StringBuilder sb = new StringBuilder(name + " 统计结果：");
+                StringBuilder sb = new StringBuilder("\n"+name + " metrics result:");
                 sb.append("\ncount: " + list.size());
                 sb.append("\nmean: " + StringUtil.detailNs((long) StatisticsUtil.mean(list)));
                 sb.append("\nmin: " + StringUtil.detailNs(list.get(0)));
                 sb.append("\nmax: " + StringUtil.detailNs(list.get(list.size() - 1)));
+                sb.append("\nsum: " + StringUtil.detailNs(StatisticsUtil.sum(list)));
                 sb.append("\n90 th: " + StringUtil.detailNs((long) StatisticsUtil.quantileNSub(0.9, list)));
                 sb.append("\n75 th: " + StringUtil.detailNs((long) StatisticsUtil.quantileNSub(0.75, list)));
                 sb.append("\n50 th: " + StringUtil.detailNs((long) StatisticsUtil.quantileNSub(0.5, list)));
@@ -65,9 +66,8 @@ public class SimpleRecorder extends AbstractRecorder {
      * @return 返回本身，装饰器模式
      */
     @Override
-    public SimpleRecorder start() {
-        event = new SpeedEvent(getName(), System.nanoTime());
-        return this;
+    protected void onStart() {
+        event = new SpeedEvent(name, System.nanoTime());
     }
 
     /**
@@ -75,20 +75,44 @@ public class SimpleRecorder extends AbstractRecorder {
      * @return 返回本身，装饰器模式
      */
     @Override
-    public SimpleRecorder end() {
+    protected void onEnd() {
         event.setEndTime(System.nanoTime());
         nums.add(event.getRunTime());
         event.setCount(nums.size());
-        getEveryPattern().print(event);
-        return this;
+        everyPattern.print(event);
+    }
+
+    /**
+     * 执行重置操作
+     */
+    @Override
+    protected void onReset() {
+        nums.clear();
+        event = null;
     }
 
     /**
      * 停止记录器，在这里将对记录器中所有内容进行统计，统计完成后清空记录器内容
      */
     @Override
-    public void stop() {
-        getStatisticPattern().print(getName(), nums);
-        nums.clear();
+    protected void onStop() {
+        nums = null;
+        event = null;
+    }
+
+    /**
+     * 执行统计操作
+     */
+    @Override
+    protected void onStatistics() {
+        statisticPattern.print(name, nums);
+    }
+
+    public static SimpleRecorder build(String name){
+        return new SimpleRecorder(name);
+    }
+
+    public static SimpleRecorder build(Class clazz){
+        return new SimpleRecorder(clazz.getSimpleName());
     }
 }

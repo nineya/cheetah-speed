@@ -1,6 +1,7 @@
 package com.nineya.cspeed.util;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author linsongwang
@@ -42,7 +43,7 @@ public class StatisticsUtil {
         }
         double position = (list.size() - 1) * n + 1;
         int m = (int)position;
-        if (m <= 0){
+        if (m <= 0 || list.size() == 1){
             return list.get(0);
         }
         long a = list.get(m);
@@ -56,6 +57,13 @@ public class StatisticsUtil {
      * @return 平均值
      */
     public static double mean(List<Long> list){
-        return list.stream().mapToDouble(a->(double)a).average().getAsDouble();
+        return list.stream().mapToLong(s->s).summaryStatistics().getAverage();
+    }
+
+    /**
+     * 计算总和
+     */
+    public static long sum(List<Long> list){
+        return list.stream().mapToLong(s->s).summaryStatistics().getSum();
     }
 }
