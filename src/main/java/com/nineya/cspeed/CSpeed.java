@@ -30,20 +30,35 @@ public class CSpeed {
      * @return Recorder记录器
      */
     public static AbstractRecorder getRecorder(String name){
-        return recorders.get(name);
+        AbstractRecorder recorder = recorders.get(name);
+        if (recorder == null){
+            recorder = SimpleRecorder.build(name);
+            recorders.put(name, recorder);
+        }
+        return recorder;
     }
 
     /**
      * 如果指定名称的记录器不存在，则使用指定的记录器创建。
-     * @param name 记录器名称
      * @param recorder Recorder记录器对象
      * @return Recorder记录器
      */
-    public static AbstractRecorder getRecorder(String name, AbstractRecorder recorder){
-        if (recorders.containsKey(name)){
-            return recorders.get(name);
+    public static AbstractRecorder getRecorder(AbstractRecorder recorder){
+        if (recorders.containsKey(recorder.getName())){
+            return recorders.get(recorder.getName());
         }
         return addRecorder(recorder);
+    }
+
+    /**
+     * 删除计速器
+     * @param recorder 待删除的计速器
+     */
+    public static void remove(Recorder recorder){
+        Recorder re = recorders.get(recorder.getName());
+        if (re != null && re == recorder){
+            recorders.remove(re.getName());
+        }
     }
 
     /**

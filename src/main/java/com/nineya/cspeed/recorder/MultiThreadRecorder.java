@@ -26,7 +26,7 @@ public class MultiThreadRecorder extends AbstractRecorder {
      * 实例化计速器
      * @param name 记录器名称
      */
-    public MultiThreadRecorder(String name) {
+    private MultiThreadRecorder(String name) {
         super(name);
     }
 

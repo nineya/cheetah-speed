@@ -9,8 +9,12 @@ import org.junit.Test;
 public class AbstractRecorderTest {
     @Test
     public void collectTest(){
-        MultiThreadRecorder.build("collectTest").collect(()->{
+        MultiThreadRecorder recorder = MultiThreadRecorder.build("collectTest");
+        recorder.collect(()->{
             System.out.println("执行测试！");
-        }).setCount(5).run();
+        })
+        .setCount(5)
+        .run()
+        .stop();
     }
 }

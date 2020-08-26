@@ -1,5 +1,6 @@
 package com.nineya.cspeed.recorder;
 
+import com.nineya.cspeed.CSpeed;
 import com.nineya.cspeed.internal.SpeedEvent;
 import com.nineya.cspeed.internal.State;
 
@@ -104,6 +105,7 @@ public abstract class AbstractRecorder implements Recorder {
         statistics();
         state = State.SYN_STOP;
         onStop();
+        CSpeed.remove(this);
         state = State.STOP;
     }
 
@@ -221,14 +223,16 @@ public abstract class AbstractRecorder implements Recorder {
     }
 
     public Collect collect(Collector collector){
-        return new Collect(collector);
+        return new Collect(this, collector);
     }
 
     public class Collect{
         private int count = 1;
         private Collector collector;
+        private Recorder recorder;
 
-        public Collect(Collector collector){
+        public Collect(Recorder recorder, Collector collector){
+            this.recorder = recorder;
             this.collector = collector;
         }
 
@@ -237,12 +241,13 @@ public abstract class AbstractRecorder implements Recorder {
             return this;
         }
 
-        public void run(){
+        public Recorder run(){
             for (int i = 0; i < count; i++){
                 start();
                 collector.run();
                 end();
             }
+            return recorder;
         }
     }
 }

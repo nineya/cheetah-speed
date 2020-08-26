@@ -16,7 +16,7 @@ public class SimpleRecorder extends AbstractRecorder {
     private List<Long> nums = new ArrayList<Long>();
     private SpeedEvent event;
 
-    public SimpleRecorder(String name) {
+    private SimpleRecorder(String name) {
         super(name);
     }
 

@@ -45,7 +45,7 @@ public class CSpeedTest {
 
     @Test
     public void addRecorder(){
-        Recorder recorder = CSpeed.addRecorder(new SimpleRecorder("addRecorder"));
+        Recorder recorder = CSpeed.addRecorder(SimpleRecorder.build("addRecorder"));
         for (int i = 0; i < 5; i++){
             recorder.start();
             try {
