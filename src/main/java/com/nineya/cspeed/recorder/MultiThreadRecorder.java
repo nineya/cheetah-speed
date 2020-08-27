@@ -126,7 +126,7 @@ public class MultiThreadRecorder extends AbstractRecorder {
     protected void onStatistics() {
         if (partThread){
             for (Map.Entry<String, List<Long>> entry : nums.entrySet()){
-                statisticPattern.print(name + " - " + entry.getKey(), entry.getValue());
+                statisticPattern.print(name + "(" + entry.getKey() +")", entry.getValue());
             }
         }
         statisticPattern.print(name + "(Total thread)", nums.values().stream().flatMap(List::stream).collect(Collectors.toList()));

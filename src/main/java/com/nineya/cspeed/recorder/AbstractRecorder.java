@@ -35,7 +35,7 @@ public abstract class AbstractRecorder implements Recorder {
      * @return
      */
     @Override
-    public Recorder start() {
+    public AbstractRecorder start() {
         if (state != State.RUN){
             System.err.println("记速器当前状态不可进行start：" + state);
             return this;
@@ -56,7 +56,7 @@ public abstract class AbstractRecorder implements Recorder {
      * @return 本身
      */
     @Override
-    public Recorder end(){
+    public AbstractRecorder end(){
         if (state != State.RUN){
             System.err.println("记速器当前状态不可进行end：" + state);
             return this;
@@ -76,7 +76,7 @@ public abstract class AbstractRecorder implements Recorder {
      * @return 执行重置记速器
      */
     @Override
-    public Recorder reset() {
+    public AbstractRecorder reset() {
         if (state != State.RUN){
             System.err.println("记速器当前状态不可进行reset：" + state);
             return this;
@@ -119,7 +119,7 @@ public abstract class AbstractRecorder implements Recorder {
      * @return 统计记速器
      */
     @Override
-    public Recorder statistics() {
+    public AbstractRecorder statistics() {
         if (state != State.RUN){
             System.err.println("记速器当前状态不可进行statistics：" + state);
             return this;
@@ -156,7 +156,7 @@ public abstract class AbstractRecorder implements Recorder {
      * @param everyPattern 记录接口
      * @return 装饰器模式，返回本身
      */
-    public Recorder setEveryPattern(EveryPattern everyPattern) {
+    public AbstractRecorder setEveryPattern(EveryPattern everyPattern) {
         this.everyPattern = everyPattern;
         return this;
     }
@@ -166,7 +166,7 @@ public abstract class AbstractRecorder implements Recorder {
      * @param statisticPattern 统计接口
      * @return 装饰器模式，返回本身
      */
-    public Recorder setStatisticPattern(StatisticPattern statisticPattern) {
+    public AbstractRecorder setStatisticPattern(StatisticPattern statisticPattern) {
         this.statisticPattern = statisticPattern;
         return this;
     }

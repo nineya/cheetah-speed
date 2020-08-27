@@ -80,6 +80,11 @@ public class StringUtil {
         return time/1000000;
     }
 
+    /**
+     * 输出具体的信息，包含格式化和毫秒
+     * @param time 纳秒级时间戳
+     * @return 转换后的字符串
+     */
     public static String detailNs(long time){
         return String.format("%s (%.2f ms)", nsPattern(time), (double)time/1000000);
     }
