@@ -60,6 +60,7 @@ public class MultiThreadRecorder extends AbstractRecorder {
                 StringBuilder sb = new StringBuilder("\n"+name + " metrics result:");
                 sb.append("\ncount: " + list.size());
                 sb.append("\nmean: " + StringUtil.detailNs((long) StatisticsUtil.mean(list)));
+                sb.append("\nmedian: " + StringUtil.detailNs((long) StatisticsUtil.median(list)));
                 sb.append("\nmin: " + StringUtil.detailNs(list.get(0)));
                 sb.append("\nmax: " + StringUtil.detailNs(list.get(list.size() - 1)));
                 sb.append("\nsum: " + StringUtil.detailNs(StatisticsUtil.sum(list)));

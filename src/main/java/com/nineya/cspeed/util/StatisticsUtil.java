@@ -66,4 +66,17 @@ public class StatisticsUtil {
     public static long sum(List<Long> list){
         return list.stream().mapToLong(s->s).summaryStatistics().getSum();
     }
+
+    /**
+     * 求中位数
+     * @param list 需要求中位数的列表
+     * @return 中位数的值
+     */
+    public static double median(List<Long> list){
+        if (list.size()%2==0){
+            int n = list.size()/2;
+            return ((double)list.get(n) + list.get(n - 1))/2;
+        }
+        return list.get(list.size()/2);
+    }
 }
